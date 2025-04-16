@@ -24,4 +24,5 @@ export interface PackageData {
 
 export interface PackageSlipProps {
   data: PackageData;
+  onGenerateNew: () => void;
 }

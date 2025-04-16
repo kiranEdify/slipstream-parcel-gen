@@ -16,6 +16,10 @@ const Index = () => {
     setActiveTab("preview");
   };
 
+  const handleGenerateNew = () => {
+    setPackageData(generateDummyData());
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="container py-8 px-4">
@@ -23,7 +27,7 @@ const Index = () => {
         <div className="flex items-center justify-center mb-8">
           <div className="flex items-center gap-2 text-center">
             <Package size={28} className="text-shipping-accent" />
-            <h1 className="text-3xl font-bold text-shipping-primary">Packing Slip Generator</h1>
+            <h1 className="text-3xl font-bold text-shipping-primary">Amazon.com Packing Slip Generator</h1>
           </div>
         </div>
 
@@ -35,7 +39,7 @@ const Index = () => {
               <TabsTrigger value="edit">Edit Package Data</TabsTrigger>
             </TabsList>
             <TabsContent value="preview" className="flex justify-center">
-              <PackageSlip data={packageData} />
+              <PackageSlip data={packageData} onGenerateNew={handleGenerateNew} />
             </TabsContent>
             <TabsContent value="edit">
               <PackageForm initialData={packageData} onSubmit={handleFormSubmit} />
@@ -46,7 +50,7 @@ const Index = () => {
       
       {/* Footer */}
       <footer className="py-6 text-center text-sm text-muted-foreground">
-        <p>Packing Slip Generator - A simple tool for generating shipping documents</p>
+        <p>Amazon.com Packing Slip Generator - A simple tool for generating shipping documents</p>
       </footer>
     </div>
   );

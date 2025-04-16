@@ -1,7 +1,6 @@
-
 import { PackageSlipProps } from "@/types/packing-slip";
 import { Card } from "@/components/ui/card";
-import { Barcode, Copy, Check, Package, Printer } from "lucide-react";
+import { Barcode, Copy, Check, Package, RefreshCcw, Printer } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import {
@@ -12,9 +11,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { formatCurrency } from "@/utils/format";
+import { formatCurrency, transformToGtParseFormat } from "@/utils/format";
 
-export const PackageSlip: React.FC<PackageSlipProps> = ({ data }) => {
+export const PackageSlip: React.FC<PackageSlipProps> = ({ data, onGenerateNew }) => {
   const [copied, setCopied] = useState(false);
   
   const calculateTotal = () => {
@@ -22,13 +21,10 @@ export const PackageSlip: React.FC<PackageSlipProps> = ({ data }) => {
   };
 
   const handleCopyJson = () => {
-    navigator.clipboard.writeText(JSON.stringify(data, null, 2));
+    const transformedData = transformToGtParseFormat(data);
+    navigator.clipboard.writeText(JSON.stringify(transformedData, null, 2));
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
-  };
-
-  const handlePrint = () => {
-    window.print();
   };
 
   return (
@@ -38,21 +34,47 @@ export const PackageSlip: React.FC<PackageSlipProps> = ({ data }) => {
         <div className="flex justify-between items-center border-b border-gray-200 pb-4">
           <div className="flex items-center gap-2">
             <Package size={32} className="text-shipping-primary" />
-            <h1 className="font-bold text-2xl text-shipping-primary">Packing Slip</h1>
+            <h1 className="font-bold text-2xl text-shipping-primary">Amazon.com</h1>
           </div>
-          <Button 
-            variant="outline" 
-            size="sm" 
-            className="print:hidden flex items-center gap-2"
-            onClick={handlePrint}
-          >
-            <Printer size={16} />
-            Print
-          </Button>
+          <div className="flex gap-2">
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={onGenerateNew}
+              className="print:hidden flex items-center gap-2"
+            >
+              <RefreshCcw size={16} />
+              Generate New
+            </Button>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="print:hidden"
+              onClick={() => window.print()}
+            >
+              <Printer size={16} className="mr-2" />
+              Print
+            </Button>
+          </div>
         </div>
 
         {/* Order Summary */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="bg-gray-50 p-4 rounded-lg">
+          <h3 className="font-semibold text-shipping-primary mb-2">Order Summary</h3>
+          <div className="grid grid-cols-2 gap-4 text-sm">
+            <div>
+              <p className="text-muted-foreground">Order Total:</p>
+              <p className="font-medium">{formatCurrency(calculateTotal())}</p>
+            </div>
+            <div>
+              <p className="text-muted-foreground">Items:</p>
+              <p className="font-medium">{data.items.length}</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Customer Info and Items */}
+        <div className="flex flex-col gap-4">
           <div className="space-y-2">
             <h3 className="font-semibold text-shipping-primary">Order Details</h3>
             <div className="grid grid-cols-2 text-sm">
@@ -78,7 +100,7 @@ export const PackageSlip: React.FC<PackageSlipProps> = ({ data }) => {
             </div>
           </div>
         </div>
-        
+
         {/* Items Table */}
         <div>
           <h3 className="font-semibold text-shipping-primary mb-2">Package Contents</h3>
@@ -109,18 +131,9 @@ export const PackageSlip: React.FC<PackageSlipProps> = ({ data }) => {
               </TableBody>
             </Table>
           </div>
-          
-          <div className="flex justify-end mt-4">
-            <div className="w-[200px]">
-              <div className="flex justify-between py-2">
-                <span className="text-muted-foreground">Total:</span>
-                <span className="font-medium">{formatCurrency(calculateTotal())}</span>
-              </div>
-            </div>
-          </div>
         </div>
-        
-        {/* Tracking */}
+
+        {/* Tracking Number */}
         <div className="border-t border-gray-200 pt-4">
           <div className="flex flex-col items-center space-y-2">
             <h3 className="font-semibold text-shipping-primary">Tracking Number</h3>
@@ -146,7 +159,7 @@ export const PackageSlip: React.FC<PackageSlipProps> = ({ data }) => {
             </Button>
           </div>
           <pre className="bg-gray-50 p-4 rounded-lg overflow-x-auto text-sm">
-            {JSON.stringify(data, null, 2)}
+            {JSON.stringify(transformToGtParseFormat(data), null, 2)}
           </pre>
         </div>
       </div>
